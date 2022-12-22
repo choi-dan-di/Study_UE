@@ -1,0 +1,29 @@
+#####################
+
+#Unreal Generated Files#
+
+####################
+
+#*/Build
+
+#*/Binaries
+
+#/DerivedDataCache
+
+#/Intermediate
+
+*/Saved
+
+############
+
+#Asset Files#
+
+###########
+
+##################
+
+#VS Generated Files#
+
+#################
+
+*/.vs
