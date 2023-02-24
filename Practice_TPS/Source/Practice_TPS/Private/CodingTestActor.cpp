@@ -17,7 +17,9 @@ void ACodingTestActor::BeginPlay()
 	Super::BeginPlay();
 	
 	// UE_LOG(LogTemp, Warning, TEXT("Hello World!"));
+	int32 result = Add(number1, number2);
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *name);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), result);
 }
 
 // Called every frame
@@ -25,5 +27,10 @@ void ACodingTestActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+int32 ACodingTestActor::Add(int32 num1, int32 num2)
+{
+	return num1 + num2;
 }
 
