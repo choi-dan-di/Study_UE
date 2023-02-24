@@ -36,7 +36,19 @@ public:
 
 	// 속력 변수
 	UPROPERTY(EditAnywhere)
-		float moveSpeed = 500;
+	float moveSpeed = 500;
+
+	// 총구 위치
+	UPROPERTY(EditAnywhere)
+	class UArrowComponent* firePosition;
+
+	// 총알 블루프린트
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABullet> bulletFactory;
+
+	// 총알 발사 효과음 파일
+	UPROPERTY(EditAnywhere)
+	class USoundBase* fireSound;
 
 private:
 	// 사용자의 키 입력 값을 받을 변수
@@ -46,4 +58,7 @@ private:
 	// 사용자 입력 처리 함수
 	void MoveHorizontal(float value);
 	void MoveVertical(float value);
+
+	// 총알 발사 입력 처리 함수
+	void Fire();
 };

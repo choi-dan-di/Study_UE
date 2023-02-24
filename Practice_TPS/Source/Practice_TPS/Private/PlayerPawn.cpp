@@ -4,6 +4,9 @@
 #include "PlayerPawn.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/ArrowComponent.h"
+#include "Bullet.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -26,6 +29,10 @@ APlayerPawn::APlayerPawn()
 	// 박스 콜라이더의 크기를 50 x 50 x 50으로 설정
 	FVector boxSize = FVector(50.0f, 50.0f, 50.0f);
 	boxComp->SetBoxExtent(boxSize);
+
+	// 총구 표시 컴포넌트를 생성하고 박스 컴포넌트의 자식 컴포넌트로 설정
+	firePosition = CreateDefaultSubobject<UArrowComponent>(TEXT("Fire Position"));
+	firePosition->SetupAttachment(boxComp);
 }
 
 // Called when the game starts or when spawned
@@ -62,6 +69,9 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Axis 바인딩 된 값을 함수에 연결한다.
 	PlayerInputComponent->BindAxis("Horizontal", this, &APlayerPawn::MoveHorizontal);
 	PlayerInputComponent->BindAxis("Vertical", this, &APlayerPawn::MoveVertical);
+
+	// Action 바인딩 된 값을 함수에 연결한다.
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerPawn::Fire);
 }
 
 // 좌우축 입력 처리 함수
@@ -74,5 +84,19 @@ void APlayerPawn::MoveHorizontal(float value)
 void APlayerPawn::MoveVertical(float value)
 {
 	v = value;
+}
+
+// 마우스 왼쪽 버튼 입력 처리 함수
+void APlayerPawn::Fire()
+{
+	// 총알 블루프린트 파일을 firePosition 위치에 생성
+	ABullet* bullet = GetWorld()->SpawnActor<ABullet>(
+		bulletFactory, 
+		firePosition->GetComponentLocation(), 
+		firePosition->GetComponentRotation()
+	);
+
+	// fireSound 변수에 할당된 음원 파일을 실행
+	UGameplayStatics::PlaySound2D(GetWorld(), fireSound);
 }
 
