@@ -19,6 +19,9 @@ AEnemyActor::AEnemyActor()
 
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh"));
 	meshComp->SetupAttachment(boxComp);
+
+	// Collision presets을 Enemy 프리셋으로 변경
+	boxComp->SetCollisionProfileName(TEXT("Enemy"));
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +52,9 @@ void AEnemyActor::BeginPlay()
 		// 그렇지 않다면 정면 방향 벡터 생성
 		dir = GetActorForwardVector();
 	}
+
+	// 박스 컴포넌트의 BeginOverlap 델리게이트에 OnEnemyOverlap 함수를 연결한다.
+	boxComp->OnComponentBeginOverlap.AddDynamic(this, &AEnemyActor::OnEnemyOverlap);
 }
 
 // Called every frame
@@ -59,5 +65,21 @@ void AEnemyActor::Tick(float DeltaTime)
 	// 이동
 	FVector newLocation = GetActorLocation() + dir * moveSpeed * DeltaTime;
 	SetActorLocation(newLocation);
+}
+
+void AEnemyActor::OnEnemyOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 충돌한 대상 액터를 APlayerPawn 클래스로 변환을 시도한다.
+	APlayerPawn* player = Cast<APlayerPawn>(OtherActor);
+
+	// 캐스팅이 성공했다면
+	if (player != nullptr)
+	{
+		// 부딪힌 대상 액터를 제거한다.
+		OtherActor->Destroy();
+	}
+
+	// 자기 자신 제거
+	Destroy();
 }
 

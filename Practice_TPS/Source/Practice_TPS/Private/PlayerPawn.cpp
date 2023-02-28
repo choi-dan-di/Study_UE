@@ -33,6 +33,23 @@ APlayerPawn::APlayerPawn()
 	// 총구 표시 컴포넌트를 생성하고 박스 컴포넌트의 자식 컴포넌트로 설정
 	firePosition = CreateDefaultSubobject<UArrowComponent>(TEXT("Fire Position"));
 	firePosition->SetupAttachment(boxComp);
+
+	// 충돌 이벤트 설정
+	// 오버랩 이벤트를 켠다.
+	boxComp->SetGenerateOverlapEvents(true);
+
+	// 충돌 응답을 Query And Physics로 설정
+	boxComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	// Object Type을 1번 채널(Player)로 설정
+	boxComp->SetCollisionObjectType(ECC_GameTraceChannel1);
+
+	// 모든 채널을 충돌 응답 없음으로 설정
+	boxComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	// 에너미와는 충돌 이벤트 체크(Query)를 한다.
+	boxComp->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
+	boxComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 }
 
 // Called when the game starts or when spawned
@@ -58,7 +75,7 @@ void APlayerPawn::Tick(float DeltaTime)
 	FVector newLocation = GetActorLocation() + dir * moveSpeed * DeltaTime;
 
 	// 4. 현재 액터의 위치 좌표를 앞에서 구한 새 좌표로 갱신
-	SetActorLocation(newLocation);
+	SetActorLocation(newLocation, true);
 }
 
 // Called to bind functionality to input
