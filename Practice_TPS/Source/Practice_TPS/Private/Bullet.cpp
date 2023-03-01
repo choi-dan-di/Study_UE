@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "EnemyActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Practice_TPSGameModeBase.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -69,6 +70,19 @@ void ABullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 			GetActorLocation(), 
 			GetActorRotation()
 		);
+
+		// 현재 게임 모드를 가져온다.
+		AGameModeBase* currentMode = GetWorld()->GetAuthGameMode();
+
+		// APractice_TPSGameModeBase 클래스로 변환한다.
+		APractice_TPSGameModeBase* currentGameModeBase = Cast<APractice_TPSGameModeBase>(currentMode);
+
+		// 게임 모드 베이스를 가져왔다면
+		if (currentGameModeBase != nullptr)
+		{
+			// 점수 추가
+			currentGameModeBase->AddScore(1);
+		}
 	}
 
 	// 자기 자신도 제거한다.
