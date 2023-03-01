@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "EngineUtils.h"
 #include "PlayerPawn.h"
+#include "Practice_TPSGameModeBase.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -77,6 +78,16 @@ void AEnemyActor::OnEnemyOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		// 부딪힌 대상 액터를 제거한다.
 		OtherActor->Destroy();
+
+		// Game Over UI 띄우기
+		// 현재 게임 모드를 가져온다.
+		APractice_TPSGameModeBase* currentGameMode = Cast<APractice_TPSGameModeBase>(GetWorld()->GetAuthGameMode());
+
+		if (currentGameMode != nullptr)
+		{
+			// 메뉴 UI 생성 함수를 호출한다.
+			currentGameMode->ShowMenu();
+		}
 	}
 
 	// 자기 자신 제거
