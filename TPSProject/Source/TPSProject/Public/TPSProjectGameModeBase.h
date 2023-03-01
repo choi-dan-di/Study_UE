@@ -14,4 +14,6 @@ class TPSPROJECT_API ATPSProjectGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	ATPSProjectGameModeBase();
 };
