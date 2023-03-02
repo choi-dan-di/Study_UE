@@ -57,4 +57,15 @@ public:
 
 	// 플레이어 이동 처리
 	void Move();
+
+	// 총 스켈레탈 메시
+	UPROPERTY(VisibleAnywhere, Category = GunMesh)
+	class USkeletalMeshComponent* gunMeshComp;
+
+	// 총알 공장
+	UPROPERTY(EditDefaultsOnly, Category = BulletFactory)
+	TSubclassOf<class ABullet> bulletFactory;
+
+	// 총알 발사 처리 함수
+	void InputFire();
 };
