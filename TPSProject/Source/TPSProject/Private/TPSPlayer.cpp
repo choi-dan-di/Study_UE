@@ -7,6 +7,7 @@
 #include "Bullet.h"
 #include <Blueprint/UserWidget.h>
 #include <Kismet/GameplayStatics.h>
+#include "EnemyFSM.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -221,6 +222,14 @@ void ATPSPlayer::InputFire()
 				FVector force = -hitInfo.ImpactNormal * hitComp->GetMass() * 500000;
 				// 충돌 컴포넌트의 AddForce()로 힘 가하기
 				hitComp->AddForce(force);
+			}
+
+			// 부딪힌 대상이 적인지 판단하기
+			auto enemy = hitInfo.GetActor()->GetDefaultSubobjectByName(TEXT("FSM"));
+			if (enemy)
+			{
+				auto enemyFSM = Cast<UEnemyFSM>(enemy);
+				enemyFSM->OnDamageProcess();
 			}
 		}
 	}
