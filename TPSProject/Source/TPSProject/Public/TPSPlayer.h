@@ -40,8 +40,12 @@ public:
 	void LookUp(float value);
 
 	// 이동 속도
+	// 걷기
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
-	float walkSpeed = 600;
+	float walkSpeed = 200;
+	// 달리기
+	UPROPERTY(EditAnywhere, Category = PlayerSetting)
+	float runSpeed = 600;
 
 	// 이동 방향
 	FVector direction;
@@ -102,4 +106,15 @@ public:
 	TSubclassOf<class UUserWidget> crosshairUIFactory;
 	// 이로부터 만들어질 인스턴스 저장
 	class UUserWidget* _crosshairUI;
+
+	// 달리기 이벤트 처리 함수
+	void InputRun();
+
+	// 카메라 셰이크 블루프린트를 저장할 변수
+	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
+	TSubclassOf<class UCameraShakeBase> cameraShake;
+
+	// 총알 발사 사운드
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	class USoundBase* bulletSound;
 };

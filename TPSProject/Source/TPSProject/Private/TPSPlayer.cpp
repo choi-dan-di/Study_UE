@@ -8,6 +8,8 @@
 #include <Blueprint/UserWidget.h>
 #include <Kismet/GameplayStatics.h>
 #include "EnemyFSM.h"
+#include <GameFramework/CharacterMovementComponent.h>
+#include "PlayerAnim.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -17,7 +19,7 @@ ATPSPlayer::ATPSPlayer()
 
 	// 1. 스켈레탈메시 데이터를 불러오고 싶다.
 	// 애셋의 경로를 인자로 넘겨준다.
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin'"));
 	if (TempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(TempMesh.Object);
@@ -47,7 +49,7 @@ ATPSPlayer::ATPSPlayer()
 	// 4. 총 스켈레탈 메시 컴포넌트 등록
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
 	// 4-1. 부모 컴포넌트를 Mesh 컴포넌트로 설정
-	gunMeshComp->SetupAttachment(GetMesh());
+	gunMeshComp->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 	// 4-2. 스켈레탈 메시 데이터 로드
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'"));
 	// 4-3. 데이터 로드가 성공했다면
@@ -56,13 +58,14 @@ ATPSPlayer::ATPSPlayer()
 		// 4-4. 스켈레탈 메시 데이터 할당
 		gunMeshComp->SetSkeletalMesh(TempGunMesh.Object);
 		// 4-5. 위치 조정하기
-		gunMeshComp->SetRelativeLocation(FVector(-14, 52, 120));
+		gunMeshComp->SetRelativeLocation(FVector(-17, 10, -3));
+		gunMeshComp->SetRelativeRotation(FRotator(0, 90, 0));
 	}
 
 	// 5. 스나이퍼건 컴포넌트 등록
 	sniperGunComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SniperGunComp"));
 	// 5-1. 부모 컴포넌트를 Mesh 컴포넌트로 설정
-	sniperGunComp->SetupAttachment(GetMesh());
+	sniperGunComp->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 	// 5-2. 스나이퍼건 스태틱 메시 데이터 로드
 	ConstructorHelpers::FObjectFinder<UStaticMesh> TempSniperMesh(TEXT("/Script/Engine.StaticMesh'/Game/SniperGun/sniper1.sniper1'"));
 	// 5-3. 데이터 로드가 성공했다면
@@ -71,16 +74,25 @@ ATPSPlayer::ATPSPlayer()
 		// 5-4. 스태틱 메시 데이터 할당
 		sniperGunComp->SetStaticMesh(TempSniperMesh.Object);
 		// 5-5. 위치 조정하기
-		sniperGunComp->SetRelativeLocation(FVector(-22, 55, 120));
+		sniperGunComp->SetRelativeLocation(FVector(-42, 7, 1));
+		sniperGunComp->SetRelativeRotation(FRotator(0, 90, 0));
 		// 5-6. 크기 조정하기
 		sniperGunComp->SetRelativeScale3D(FVector(0.15f));
 	}
+
+	// 총알 사운드 가져오기
+	ConstructorHelpers::FObjectFinder<USoundBase> tempSound(TEXT("/Script/Engine.SoundWave'/Game/SniperGun/Rifle.Rifle'"));
+	if (tempSound.Succeeded())
+		bulletSound = tempSound.Object;
 }
 
 // Called when the game starts or when spawned
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 초기 속도를 걷기로 설정
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 
 	// 1. 스나이퍼 UI 위젯 인스턴스 생성
 	_sniperUI = CreateWidget(GetWorld(), sniperUIFactory);
@@ -129,6 +141,10 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	// 스나이퍼 조준 입력 이벤트 바인딩
 	PlayerInputComponent->BindAction(TEXT("Sniper"), IE_Pressed, this, &ATPSPlayer::SniperAim);
 	PlayerInputComponent->BindAction(TEXT("Sniper"), IE_Released, this, &ATPSPlayer::SniperAim);
+
+	// 달리기 이벤트 바인딩
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &ATPSPlayer::InputRun);
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &ATPSPlayer::InputRun);
 }
 
 void ATPSPlayer::Turn(float value)
@@ -177,6 +193,17 @@ void ATPSPlayer::Move()
 
 void ATPSPlayer::InputFire()
 {
+	// 총알 발사 사운드 재생
+	UGameplayStatics::PlaySound2D(GetWorld(), bulletSound);
+
+	// 카메라 셰이크 재생
+	auto controller = GetWorld()->GetFirstPlayerController();
+	controller->PlayerCameraManager->StartCameraShake(cameraShake);
+
+	// 공격 애니메이션 재생
+	auto anim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
+	anim->PlayAttackAnim();
+
 	if (bUsingGrenadeGun)
 	{
 		// 총알 발사 처리 (유탄총)
@@ -278,6 +305,21 @@ void ATPSPlayer::SniperAim()
 		tpsCamComp->SetFieldOfView(90.0f);
 		// 4. 일반 조준 위젯 UI 복원
 		_crosshairUI->AddToViewport();
+	}
+}
+
+void ATPSPlayer::InputRun()
+{
+	auto movement = GetCharacterMovement();
+	// 현재 달리기 모드라면
+	if (movement->MaxWalkSpeed > walkSpeed)
+	{
+		// 걷기 속도로 전환
+		movement->MaxWalkSpeed = walkSpeed;
+	}
+	else
+	{
+		movement->MaxWalkSpeed = runSpeed;
 	}
 }
 
