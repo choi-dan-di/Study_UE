@@ -145,6 +145,10 @@ void UEnemyFSM::DamageState()
 
 void UEnemyFSM::DieState()
 {
+	// 아직 죽음 애니메이션이 끝나지 않았다면 바닥 내려가지 않도록 처리
+	if (!anim->bDieDone)
+		return;
+
 	// 계속 아래로 내려가고 싶다.
 	// 등속운동으로
 	FVector P0 = me->GetActorLocation();
@@ -170,6 +174,13 @@ void UEnemyFSM::OnDamageProcess()
 	{
 		// 상태를 피격으로 전환
 		mState = EEnemyState::Damage;
+
+		currentTime = 0;
+
+		// 피격 애니메이션 재생
+		int32 index = FMath::RandRange(0, 1);
+		FString sectionName = FString::Printf(TEXT("Damage%d"), 0);
+		anim->PlayDamageAnim(FName(*sectionName));
 	}
 	else
 	{
@@ -177,6 +188,8 @@ void UEnemyFSM::OnDamageProcess()
 		mState = EEnemyState::Die;
 		// 캡슐 충돌체 비활성화
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		// 죽음 애니메이션 재생
+		anim->PlayDamageAnim(TEXT("Die"));
 	}
 	// 애니메이션 상태 동기화
 	anim->animState = mState;
