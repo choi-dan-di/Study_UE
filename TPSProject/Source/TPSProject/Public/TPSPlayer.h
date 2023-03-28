@@ -33,35 +33,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	class UCameraComponent* tpsCamComp;
 
-	// 좌우 회전 입력 처리
-	void Turn(float value);
-
-	// 상하 회전 입력 처리
-	void LookUp(float value);
-
-	// 이동 속도
-	// 걷기
-	UPROPERTY(EditAnywhere, Category = PlayerSetting)
-	float walkSpeed = 200;
-	// 달리기
-	UPROPERTY(EditAnywhere, Category = PlayerSetting)
-	float runSpeed = 600;
-
-	// 이동 방향
-	FVector direction;
-
-	// 좌우 이동 입력 이벤트 처리 함수
-	void InputHorizontal(float value);
-
-	// 상하 이동 입력 이벤트 처리 함수
-	void InputVertical(float value);
-
-	// 점프 입력 이벤트 처리 합수
-	void InputJump();
-
-	// 플레이어 이동 처리
-	void Move();
-
 	// 총 스켈레탈 메시
 	UPROPERTY(VisibleAnywhere, Category = GunMesh)
 	class USkeletalMeshComponent* gunMeshComp;
@@ -107,8 +78,7 @@ public:
 	// 이로부터 만들어질 인스턴스 저장
 	class UUserWidget* _crosshairUI;
 
-	// 달리기 이벤트 처리 함수
-	void InputRun();
+	
 
 	// 카메라 셰이크 블루프린트를 저장할 변수
 	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
@@ -117,4 +87,8 @@ public:
 	// 총알 발사 사운드
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	class USoundBase* bulletSound;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = Component)
+	class UPlayerBaseComponent* playerMove;
 };
