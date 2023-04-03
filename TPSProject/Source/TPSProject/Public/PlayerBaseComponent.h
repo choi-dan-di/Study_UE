@@ -18,6 +18,9 @@ public:
 	// Sets default values for this component's properties
 	UPlayerBaseComponent();
 
+	// BeginPlay() 함수보다 먼저 호출되는 라이프사이클 함수 오버라이드
+	virtual void InitializeComponent() override;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
