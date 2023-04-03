@@ -154,7 +154,7 @@ void UEnemyFSM::AttackState()
 	if (currentTime > attackDelayTime)
 	{
 		// 3. 공격하고 싶다.
-		PRINT_LOG(TEXT("Attack!!!"));
+		// PRINT_LOG(TEXT("Attack!!!"));
 		// 경과 시간 초기화
 		currentTime = 0;
 		anim->bAttackPlay = true;
