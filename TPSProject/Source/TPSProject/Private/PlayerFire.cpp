@@ -128,6 +128,9 @@ void UPlayerFire::ChangeToGrenadeGun()
 	bUsingGrenadeGun = true;
 	gunMeshComp->SetVisibility(true);
 	sniperGunComp->SetVisibility(false);
+
+	// 유탄총 사용할지 여부 전달
+	me->OnUsingGrenade(bUsingGrenadeGun);
 }
 
 void UPlayerFire::ChangeToSniperGun()
@@ -135,6 +138,9 @@ void UPlayerFire::ChangeToSniperGun()
 	bUsingGrenadeGun = false;
 	gunMeshComp->SetVisibility(false);
 	sniperGunComp->SetVisibility(true);
+
+	// 유탄총 사용할지 여부 전달
+	me->OnUsingGrenade(bUsingGrenadeGun);
 }
 
 void UPlayerFire::SniperAim()

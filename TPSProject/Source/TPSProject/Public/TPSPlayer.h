@@ -68,4 +68,8 @@ public:
 	// 게임 오버될 때 호출될 함수
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Health)
 	void OnGameOver();
+
+	// 총 바꿀 때 호출되는 이벤트 함수
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Health)
+		void OnUsingGrenade(bool isGrenade);
 };
