@@ -26,7 +26,7 @@ AEnemy::AEnemy()
 	// EnemyFSM 컴포넌트 추가
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
 
-	// 애니메이션 블루프린트 할당하기
+	// 애니메이션 블루프린트 할당하기 (P. 279)
 	ConstructorHelpers::FClassFinder<UAnimInstance> tempClass(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/ABP_Enemy.ABP_Enemy_C'"));
 	if (tempClass.Succeeded())
 		GetMesh()->SetAnimInstanceClass(tempClass.Class);
