@@ -27,6 +27,8 @@ AEnemy::AEnemy()
 	fsm = CreateDefaultSubobject<UEnemyFSM>(TEXT("FSM"));
 
 	// 애니메이션 블루프린트 할당하기 (P. 279)
+	// AnimNotify_AttackPlaying 문제인데.. 왜 그런건진 모르겠네..
+	// 아마 Get Player Pawn이 없어서 발생하는 것 같은데..
 	ConstructorHelpers::FClassFinder<UAnimInstance> tempClass(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/ABP_Enemy.ABP_Enemy_C'"));
 	if (tempClass.Succeeded())
 		GetMesh()->SetAnimInstanceClass(tempClass.Class);
